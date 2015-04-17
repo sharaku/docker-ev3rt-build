@@ -21,13 +21,13 @@ RUN \
 RUN apt-get install -y wget git vim bzip2 nkf unzip bc build-essential
 
 # ----------------------------------------------------------------------
-# add-apt-repositoryインストール
+# add-apt-repository繧､繝ｳ繧ｹ繝医�ｼ繝ｫ
 RUN \
   apt-get update && \
   apt-get install -y software-properties-common
 
 # ----------------------------------------------------------------------
-# ARM Toolchainのinstall
+# ARM Toolchain縺ｮinstall
 RUN \
   DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:terry.guo/gcc-arm-embedded && \
   apt-get update
