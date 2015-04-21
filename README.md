@@ -1,51 +1,51 @@
 # ev3rt-build
 ===============
 
-# �͂��߂�
-docker�ɂ�EV3RT(arm�p�r���h��)�r���h����񋟂���R���e�i�ł��B  
-sshd�����Ă���A�R���e�i�N�����ɐݒ肵��1���[�U�Ń��O�C���ł��܂��B  
-�R���e�i��port���Ԃ���Ȃ�����A�C�ӂ̐��N���ł��܂��B  
-jenkins-slave�Ƃ��Ă̗��p��z�肵�Ajava��sshd���C���X�g�[���ς݂ł��B
+# はじめに
+dockerにてEV3RT(arm用ビルド環境)ビルド環境を提供するコンテナです。  
+sshdを内包しており、コンテナ起動時に設定した1ユーザでログインできます。  
+コンテナはportがぶつからない限り、任意の数起動できます。  
+jenkins-slaveとしての利用を想定し、javaとsshdをインストール済みです。
 
-�܂��A�R���e�i���̃t�@�C���̓z�X�g������͊u������܂��B�i���I�ȃt�@�C���̕ۑ����K�v�ȏꍇ��-v�I�v�V�������g�p���ăz�X�g���̃f�B���N�g�����}�E���g���Ă��������B
+また、コンテナ内のファイルはホスト側からは隔離されます。永続的なファイルの保存が必要な場合は-vオプションを使用してホスト側のディレクトリをマウントしてください。
 
-�g����
+使い方
 ------
 # Installation
-�ȉ��̂悤��docker image��pull���܂��B
+以下のようにdocker imageをpullします。
 
     docker pull sharaku/ev3rt-build
 
-Docker image�������ō\�z���邱�Ƃ��ł��܂��B
+Docker imageを自分で構築することもできます。
 
     https://github.com/sharaku/docker-ev3rt-build.git
     cd docker-ev3rt-build
     docker build --tag="$USER/ev3rt-build" .
 
 # Quick Start
-ev3rt-build��image�����s���܂��B
+ev3rt-buildのimageを実行します。
 
     docker run -d -e "LOGIN_USER=login_user:login_user_passwd" -p 10022:22 sharaku/ev3rt-build
 
-sshd�̑����/bin/bash�ŋN�����邱�Ƃ��ł��܂��B
-���̏ꍇ�Aroot���[�U�ł̃��O�C���ƂȂ�܂��B
+sshdの代わりに/bin/bashで起動することもできます。
+この場合、rootユーザでのログインとなります。
 
     docker run -it sharaku/ev3rt-build /bin/bash
 
 ## Argument
 
 +   `-v /path/to/data:/path/to/container/data:rw` :  
-    �i���I�ɕۑ�����f�[�^�̃f�B���N�g�����w�肵�܂��B�C�ӂ̐���-v�I�v�V�������g�p�\�ł��B
+    永続的に保存するデータのディレクトリを指定します。任意の数の-vオプションを使用可能です。
 
 +   `-e "LOGIN_USER=login_user:login_user_passwd"` :  
-    ���O�C�����郆�[�U���A�p�X���[�h��":"�ŋ�؂��Ďw�肵�܂��B  
-    ��F-e "LOGIN_USER=hogehoge:hogehoge-passwd"
+    ログインするユーザ名、パスワードを":"で区切って指定します。  
+    例：-e "LOGIN_USER=hogehoge:hogehoge-passwd"
 
 +   -p port:22 :  
-    �O�����J����|�[�g��ݒ肵�܂��B
+    外部公開するポートを設定します。
 
 # Installed environment
-ev3rt-build�R���e�i�ɂ͈ȉ����C���X�g�[���ς݂ł��B
+ev3rt-buildコンテナには以下がインストール済みです。
 
 base:debian 7.6
 
@@ -62,22 +62,22 @@ tools:
 
     wget, git, vim, bzip2, nkf, unzip, bc, default-jdk, qemu
 
-���p��
+利用例
 ------
 
 # ev3rt-build
-�X�^���_�[�h��ev3rt-build�Ƃ��Ďg�p����ɂ͈ȉ��̂悤�ɂ��܂��B
+スタンダードなev3rt-buildとして使用するには以下のようにします。
 
-�ȉ��̏�����ev3rt-build���\�z�����ł��B
+以下の条件でev3rt-buildを構築する例です。
 
-+ docker����z�X�g��IP�F192.168.0.2
-+ ���[�U���Fhogehoge
-+ �p�X���[�h�Fhogehoge-passwd
-+ �|�[�g�F10022
-+ �{�����[���i�z�X�g���j�F/var/lib/build-volume
-+ �{�����[���i�R���e�i���j�F/var/lib/volume
++ docker動作ホストのIP：192.168.0.2
++ ユーザ名：hogehoge
++ パスワード：hogehoge-passwd
++ ポート：10022
++ ボリューム（ホスト側）：/var/lib/build-volume
++ ボリューム（コンテナ側）：/var/lib/volume
 
-�@
+　
 
     mkdir /var/lib/build-volume
 
@@ -88,40 +88,40 @@ tools:
 
 
 # jenkins-slave
-jenkins-slave�Ƃ��Ďg�p����ɂ͈ȉ��̂悤�ɂ��܂��B
+jenkins-slaveとして使用するには以下のようにします。
 
-+ ���[�U���Fjenkins
-+ �p�X���[�h�Fjenkins###
-+ jenkins�|�[�g�F8080
-+ �|�[�g(�������p)�F10022
-+ �{�����[���i�z�X�g���j�F/var/lib/jenkins-volume
-+ �{�����[���i�R���e�i���j�F/var/lib/jenkins
++ ユーザ名：jenkins
++ パスワード：jenkins###
++ jenkinsポート：8080
++ ポート(内部利用)：10022
++ ボリューム（ホスト側）：/var/lib/jenkins-volume
++ ボリューム（コンテナ側）：/var/lib/jenkins
 
-�菇
+手順
 
-1.�r���h���̕ۑ��̈���쐬���܂�  
+1.ビルド環境の保存領域を作成します  
 
       mkdir /var/lib/jenkins-volume
 
-2.sharaku/ev3rt-build�R���e�i���N�����܂��B  
+2.sharaku/ev3rt-buildコンテナを起動します。  
 
       docker run -d \
         -v /var/lib/jenkins-volume:/var/lib/jenkins:rw \
         -e "LOGIN_USER=jenkins:jenkins###" \
         -p 10022:22 sharaku/ev3rt-build
 
-3.jenkins���N�����A�ݒ���s���܂��B  
+3.jenkinsを起動し、設定を行います。  
 
       docker run -d -p 8080:8080 jenkins
 
-4.�u���E�U����Ajenkins�֐ڑ����܂��B  
-5.jenkins�̃��j���[���� `Jenkins�̊Ǘ� -> �m�[�h�̊Ǘ� -> �V�K�m�[�h�쐬` ���J���܂��B  
-6. `�m�[�h��` ����͌�A`�_���X���[�u` �Ƀ`�F�b�N�����A`OK`�������܂��B  
-7.`�����[�gFS���[�g`��"/var/lib/jenkins"����͂��܂��B  
-8.`�N�����@`��"ssh�o�R�Ł`"��I�����܂��B  
-9.`�z�X�g`�̓z�X�g��IP�������́A�h���C�����w�肵�܂��B  
-10.`�F�؏��`��`add`�������A���[�U���ƃp�X���[�h��ݒ肵�܂��B  
-11.`���x�Ȑݒ�`�������A`�|�[�g`�̗���10022���w�肵�܂��B  
-12.`�ۑ�`�������܂��B
+4.ブラウザから、jenkinsへ接続します。  
+5.jenkinsのメニューから `Jenkinsの管理 -> ノードの管理 -> 新規ノード作成` を開きます。  
+6. `ノード名` を入力後、`ダムスレーブ` にチェックを入れ、`OK`を押します。  
+7.`リモートFSルート`は"/var/lib/jenkins"を入力します。  
+8.`起動方法`は"ssh経由で～"を選択します。  
+9.`ホスト`はホストのIPもしくは、ドメインを指定します。  
+10.`認証情報`は`add`を押し、ユーザ名とパスワードを設定します。  
+11.`高度な設定`を押し、`ポート`の欄に10022を指定します。  
+12.`保存`を押します。
 
-�ȏ�Őڑ����ł���悤�ɂȂ�܂��B
+以上で接続ができるようになります。
